@@ -20,7 +20,7 @@ formWrap.addEventListener("submit", (e) => {
 })
 
 
-//✅localStorage
+//localStorage
 const storage = {
   setLocalStorage(list) {
     localStorage.setItem("list", JSON.stringify(list))
@@ -31,17 +31,25 @@ const storage = {
 }
 
 function App() {
-  //✅localStorage render
-  this.list = []
+  //localStorage render
+  //✅localStorage list [] => {} & currentMenu & init trimming
+  this.list = {
+    important: [],
+    study: [],
+    life: [],
+  }
+
+  this.currentMenu = "important"
+
   this.init = () => {
-    if(storage.getLocalStorage().length > 0) {
+    if(storage.getLocalStorage()) {
       this.list = storage.getLocalStorage()
     }
     render()
   }
 
   const render = () => {
-    const template = this.list.map((item, index) => {
+    const template = this.list[this.currentMenu].map((item, index) => {
       return `
       <li data-list-id="${index}" class="todo-item">
         <span class="item-name">${item.title}</span>
@@ -80,8 +88,8 @@ function App() {
       return
     }
 
-    //✅list add
-    this.list.push({ title: listInputValue})
+    //list add
+    this.list[this.currentMenu].push({ title: listInputValue})
     storage.setLocalStorage(this.list)
 
     render()
@@ -102,12 +110,12 @@ function App() {
 
   //toDo list modify & toDo list delete
   const editToDoList = (e) => {
-    //✅list modify
+    //list modify
     const itemName = e.target.closest('li').querySelector('.item-name') 
     const updatedItemName = prompt("수정하세요", itemName.innerText)
 
     const listId = e.target.closest('li').dataset.listId
-    this.list[listId].title = updatedItemName
+    this.list[this.currentMenu][listId].title = updatedItemName
     storage.setLocalStorage(this.list)
 
     //rendering
@@ -115,9 +123,9 @@ function App() {
   }
 
   const removeToDoList = (e) => {
-    //✅list delete
+    //list delete
     const listId = e.target.closest('li').dataset.listId
-    this.list.splice(listId, 1)
+    this.list[this.currentMenu].splice(listId, 1)
     storage.setLocalStorage(this.list)
     e.target.closest('li').remove()
     //list count
@@ -133,8 +141,19 @@ function App() {
       removeToDoList(e)
     }
   })
+
+
+  const menuBtn = document.querySelector('.btn-wrap')
+
+  menuBtn.addEventListener("click", (e) => {
+    const isMenuBtn = e.target.classList.contains("menu-btn")
+    if(isMenuBtn) {
+      const menuName = e.target.dataset.menuName
+      this.currentMenu = menuName
+      render()
+    }
+  })
 }
 
-//✅{ } creation
 const app = new App();
 app.init()
