@@ -10,3 +10,11 @@ const day = weekday[today.getDay()];
 
 inputLabel.innerText = yaer + '/' + month + '/' + date + '/' + day;
 // inputLabel.innerText = today.toLocaleDateString();
+
+
+//✅formTag auto submit prohibit
+const formWrap = document.querySelector('.input-wrap')
+
+formWrap.addEventListener("submit", (e) => {
+  e.preventDefault()
+})
