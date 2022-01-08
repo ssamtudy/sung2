@@ -32,7 +32,6 @@ const storage = {
 
 function App() {
   //localStorage render
-  //✅localStorage list [] => {} & currentMenu & init trimming
   this.list = {
     important: [],
     study: [],
@@ -47,12 +46,12 @@ function App() {
     }
     render()
   }
-
+//✅item.done ternary if+
   const render = () => {
     const template = this.list[this.currentMenu].map((item, index) => {
       return `
       <li data-list-id="${index}" class="todo-item">
-        <span class="item-name">${item.title}</span>
+        <span class="${item.done ? 'done' : ''} item-name">${item.title}</span>
         <div class="item-btn">
           <button type="button" class="done-btn">완료</button>
           <button type="button" class="edit-btn">수정</button>
@@ -75,7 +74,8 @@ function App() {
   const submitBtn = document.querySelector('.submit')
 
   const updatedListCount = () => {
-    const listCountValue = toDoList.querySelectorAll("li").length
+    // const listCountValue = toDoList.querySelectorAll("li").length
+    const listCountValue = this.list[this.currentMenu].length
     listCount.innerText = `${listCountValue}`
   }
 
@@ -129,16 +129,31 @@ function App() {
     storage.setLocalStorage(this.list)
     e.target.closest('li').remove()
     //list count
-    updatedListCount()
+    render()
+  }
+
+  //✅toDo list complete
+  const doneToDoList = (e) => {
+    const listId = e.target.closest('li').dataset.listId
+    this.list[this.currentMenu][listId].done = !this.list[this.currentMenu][listId].done
+    storage.setLocalStorage(this.list)
+    render()
   }
 
   toDoList.addEventListener("click", (e) => {
     if(e.target.classList.contains("edit-btn")) {
       editToDoList(e)
+      return
     }
 
     if(e.target.classList.contains("remove-btn")) {
       removeToDoList(e)
+      return
+    }
+
+    if(e.target.classList.contains("done-btn")) {
+      doneToDoList(e)
+      return
     }
   })
 
