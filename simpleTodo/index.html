@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>to-do</title>
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1><span class="title">ToDo</span></h1>
+    <nav class="btn-wrap">
+      <button data-menu-name="important" class="menu-btn">✔ Important</button>
+      <button data-menu-name="study" class="menu-btn">📚 Study</button>
+      <button data-menu-name="life" class="menu-btn">😊 Life</button>
+      <button data-menu-name="plus" class="plus-btn">➕</button>
+    </nav>
+  </header>
+  <section class="wrap">
+    <form action="#" class="input-wrap">
+      <label for="list" class="label"></label>
+      <input id="list" type="text">
+      <button type="button" class="submit">➕</button>
+    </form>
+    <p class="todo-count">할 일 목록: <span class="list-count">0</span>개</p>
+    <ul id="todo-list"></ul>
+  </section>
+  <script src="app.js"></script>
+</body>
+</html>
