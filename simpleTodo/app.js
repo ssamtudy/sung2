@@ -20,78 +20,121 @@ formWrap.addEventListener("submit", (e) => {
 })
 
 
-//✅toDo list add
-const listInput = document.querySelector('#list')
-const toDoList = document.querySelector('#todo-list')
-const listCount = document.querySelector('.list-count')
-const submitBtn = document.querySelector('.submit')
-
-const updatedListCount = () => {
-  const listCountValue = toDoList.querySelectorAll("li").length
-  listCount.innerText = `${listCountValue}`
+//✅localStorage
+const storage = {
+  setLocalStorage(list) {
+    localStorage.setItem("list", JSON.stringify(list))
+  },
+  getLocalStorage() {
+    return JSON.parse (localStorage.getItem("list"))
+  } 
 }
 
-const addToDoList = () => {
-  const listInputValue = listInput.value
-
-  if(listInputValue === "") {
-    alert("입력해주세요")
-    return
+function App() {
+  //✅localStorage render
+  this.list = []
+  this.init = () => {
+    if(storage.getLocalStorage().length > 0) {
+      this.list = storage.getLocalStorage()
+    }
+    render()
   }
 
-  //list add
-  const listTemplate = (listInputValue) => {
-    return `
-    <li class="todo-item">
-      <span class="item-name">${listInputValue}</span>
-      <div class="item-btn">
-        <button type="button" class="done-btn">완료</button>
-        <button type="button" class="edit-btn">수정</button>
-        <button type="button" class="remove-btn">삭제</button>
-      </div>
-    </li>`
+  const render = () => {
+    const template = this.list.map((item, index) => {
+      return `
+      <li data-list-id="${index}" class="todo-item">
+        <span class="item-name">${item.title}</span>
+        <div class="item-btn">
+          <button type="button" class="done-btn">완료</button>
+          <button type="button" class="edit-btn">수정</button>
+          <button type="button" class="remove-btn">삭제</button>
+        </div>
+      </li>`
+    }).join(" ")
+
+    toDoList.innerHTML = template
+
+    //list count
+    updatedListCount()
   }
 
-  toDoList.insertAdjacentHTML("beforeend", listTemplate(listInputValue))
 
-  //list count
-  updatedListCount()
+  //toDo list add
+  const listInput = document.querySelector('#list')
+  const toDoList = document.querySelector('#todo-list')
+  const listCount = document.querySelector('.list-count')
+  const submitBtn = document.querySelector('.submit')
 
-  //inputValue reset
-  listInput.value = ""
+  const updatedListCount = () => {
+    const listCountValue = toDoList.querySelectorAll("li").length
+    listCount.innerText = `${listCountValue}`
+  }
+
+  const addToDoList = () => {
+    
+    const listInputValue = listInput.value
+
+    if(listInputValue === "") {
+      alert("입력해주세요")
+      return
+    }
+
+    //✅list add
+    this.list.push({ title: listInputValue})
+    storage.setLocalStorage(this.list)
+
+    render()
+
+    //inputValue reset
+    listInput.value = ""
+  }
+
+  submitBtn.addEventListener("click", addToDoList)
+
+  listInput.addEventListener("keydown", (e) => {
+    if(e.key !== "Enter") {
+      return
+    }
+    addToDoList()
+  })
+
+
+  //toDo list modify & toDo list delete
+  const editToDoList = (e) => {
+    //✅list modify
+    const itemName = e.target.closest('li').querySelector('.item-name') 
+    const updatedItemName = prompt("수정하세요", itemName.innerText)
+
+    const listId = e.target.closest('li').dataset.listId
+    this.list[listId].title = updatedItemName
+    storage.setLocalStorage(this.list)
+
+    //rendering
+    itemName.innerText = updatedItemName
+  }
+
+  const removeToDoList = (e) => {
+    //✅list delete
+    const listId = e.target.closest('li').dataset.listId
+    this.list.splice(listId, 1)
+    storage.setLocalStorage(this.list)
+    e.target.closest('li').remove()
+    //list count
+    updatedListCount()
+  }
+
+  toDoList.addEventListener("click", (e) => {
+    if(e.target.classList.contains("edit-btn")) {
+      editToDoList(e)
+    }
+
+    if(e.target.classList.contains("remove-btn")) {
+      removeToDoList(e)
+    }
+  })
 }
 
-submitBtn.addEventListener("click", addToDoList)
-
-listInput.addEventListener("keydown", (e) => {
-  if(e.key !== "Enter") {
-    return
-  }
-  addToDoList()
-})
-
-
-//✅toDo list modify & toDo list delete
-const editToDoList = (e) => {
-  const itemName = e.target.closest('li').querySelector('.item-name') 
-  //list modify
-  const updatedItemName = prompt("수정하세요", itemName.innerText)
-  itemName.innerText = updatedItemName
-}
-
-const removeToDoList = (e) => {
-  //list delete
-  e.target.closest('li').remove()
-  //list count
-  updatedListCount()
-}
-
-toDoList.addEventListener("click", (e) => {
-  if(e.target.classList.contains("edit-btn")) {
-    editToDoList(e)
-  }
-
-  if(e.target.classList.contains("remove-btn")) {
-    removeToDoList(e)
-  }
-})
+//✅{ } creation
+const app = new App();
+app.init()
